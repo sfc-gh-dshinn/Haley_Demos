@@ -15,7 +15,7 @@ class CustomSnowflakeLLM:
     with proper error handling and response management.
     """
     
-    def __init__(self, session: Session, model: str = "llama3-70b"):
+    def __init__(self, session: Session, model: str = "openai-gpt-4.1"):
         """
         Initialize CustomSnowflakeLLM.
         
@@ -28,12 +28,8 @@ class CustomSnowflakeLLM:
         
         # Available Snowflake Cortex models
         self.available_models = [
-            "llama3-70b",
-            "llama3-8b", 
-            "mistral-7b",
-            "mistral-large",
-            "mixtral-8x7b",
-            "llama2-70b-chat"
+            "openai-gpt-4.1",
+            "openai-o4-mini",
         ]
         
         if model not in self.available_models:
@@ -55,7 +51,7 @@ class CustomSnowflakeLLM:
             
             # Build Snowflake Cortex query
             sql_query = f"""
-            SELECT SNOWFLAKE.CORTEX.COMPLETE(
+            SELECT TEMP.PUBLIC.AI_COMPLETE_WRAPPER_PROMPT(
                 '{self.model}',
                 '{escaped_prompt}'
             ) as response

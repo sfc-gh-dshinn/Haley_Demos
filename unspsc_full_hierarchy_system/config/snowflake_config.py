@@ -1,7 +1,7 @@
 """
 Snowflake Configuration for Production UNSPSC System
 
-Automatically connects to your haleyconnect Snowflake connection.
+Automatically connects to your Snowflake connection from within Snowflake.
 Provides easy setup and LLM integration.
 """
 
@@ -9,14 +9,13 @@ import sys
 import os
 from pathlib import Path
 from typing import Optional
-import toml
-from snowflake.snowpark import Session
+from snowflake.snowpark.context import get_active_session
 
 # Global session instance
 _session: Optional[Session] = None
 _llm = None
 
-def get_snowflake_session(connection_name: str = "haleyconnect") -> Session:
+def get_snowflake_session() -> Session:
     """
     Get Snowflake session using existing set up Snowflake configuration.
     
@@ -31,37 +30,8 @@ def get_snowflake_session(connection_name: str = "haleyconnect") -> Session:
     print(f"🔗 Connecting to Snowflake using {connection_name}...")
     
     try:
-        # Read your connections.toml file
-        config_path = Path.home() / ".snowflake" / "connections.toml"
-        
-        if not config_path.exists():
-            raise Exception(f"❌ Snowflake config not found at {config_path}")
-            
-        config = toml.load(config_path)
-        
-        if connection_name not in config:
-            raise Exception(f"❌ Connection '{connection_name}' not found in config")
-            
-        conn_config = config[connection_name]
-        
-        # Build connection parameters
-        connection_params = {
-            "account": conn_config["account"],
-            "user": conn_config["user"],
-            "role": conn_config["role"]
-        }
-        
-        # Handle JWT authentication
-        if conn_config.get("authenticator") == "SNOWFLAKE_JWT":
-            private_key_file = conn_config.get("private_key_file")
-            if private_key_file and Path(private_key_file).exists():
-                connection_params["private_key_file"] = private_key_file
-            else:
-                raise Exception(f"❌ Private key file not found: {private_key_file}")
-        
-        # Create session
-        _session = Session.builder.configs(connection_params).create()
-        print(f"✅ Connected to Snowflake ({connection_name})")
+        _session = get_active_session()
+        print(f"✅ Connected to Snowflake")
         
         # Test the connection
         result = _session.sql("SELECT CURRENT_USER(), CURRENT_ROLE(), CURRENT_DATABASE()").collect()
@@ -75,9 +45,7 @@ def get_snowflake_session(connection_name: str = "haleyconnect") -> Session:
     except Exception as e:
         print(f"❌ Snowflake connection failed: {e}")
         print("\n🔧 SETUP INSTRUCTIONS:")
-        print("1. Ensure ~/.snowflake/connections.toml exists")
-        print("2. Ensure haleyconnect section is configured")
-        print("3. Ensure private key file exists and is accessible")
+        print("1. This assumes you're operating this library within Snowflake such that get_activate_session is available")
         raise
 
 def get_snowflake_llm(model_name: str = "llama3-70b"):
@@ -125,7 +93,7 @@ def close_session():
     
     _llm = None
 
-def test_connection(connection_name: str = "haleyconnect") -> bool:
+def test_connection() -> bool:
     """
     Test the Snowflake connection and LLM functionality.
     
@@ -140,7 +108,7 @@ def test_connection(connection_name: str = "haleyconnect") -> bool:
         print("=" * 40)
         
         # Test session
-        session = get_snowflake_session(connection_name)
+        session = get_snowflake_session()
         print("✅ Session connection successful")
         
         # Test LLM

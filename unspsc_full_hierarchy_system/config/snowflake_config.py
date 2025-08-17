@@ -48,7 +48,7 @@ def get_snowflake_session() -> Session:
         print("1. This assumes you're operating this library within Snowflake such that get_activate_session is available")
         raise
 
-def get_snowflake_llm(model_name: str = "llama3-70b"):
+def get_snowflake_llm(model_name: str = "openai-gpt-4.1"):
     """
     Get Snowflake LLM instance using the established session.
     

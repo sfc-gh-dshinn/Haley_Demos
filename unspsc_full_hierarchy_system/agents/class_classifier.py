@@ -77,12 +77,9 @@ class ClassClassifier:
                 "fallback_to_family": True
             }
         
-        # Limit classes for prompt size (most relevant ones)
-        limited_classes = available_classes[:12]  
-        
         # Create class classification prompt
         classes_list = []
-        for class_item in limited_classes:
+        for class_item in available_classes:
             classes_list.append(f"{class_item['code']}: {class_item['description']}")
         
         classes_text = "\n".join(classes_list)

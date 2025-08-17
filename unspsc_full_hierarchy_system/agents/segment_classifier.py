@@ -72,7 +72,7 @@ class SegmentClassifier:
         
         # Create segment classification prompt
         segments_list = []
-        for segment in available_segments[:20]:  # Limit for prompt size
+        for segment in available_segments:
             segments_list.append(f"{segment['code']}: {segment['description']}")
         
         segments_text = "\n".join(segments_list)

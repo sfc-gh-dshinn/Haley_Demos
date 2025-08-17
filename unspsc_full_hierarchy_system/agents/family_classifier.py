@@ -72,12 +72,9 @@ class FamilyClassifier:
         
         print(f"📋 Using {len(available_families)} available families for classification")
         
-        # Limit families for prompt size (most relevant ones)
-        limited_families = available_families[:10]  
-        
         # Create family classification prompt
         families_list = []
-        for family in limited_families:
+        for family in available_families:
             families_list.append(f"{family['code']}: {family['description']}")
         
         families_text = "\n".join(families_list)

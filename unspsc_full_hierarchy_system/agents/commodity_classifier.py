@@ -79,7 +79,7 @@ class CommodityClassifier:
         
         # Create commodity classification prompt
         commodities_list = []
-        for commodity in available_commodities[:15]:  # Limit for prompt size
+        for commodity in available_commodities:
             commodities_list.append(f"{commodity['code']}: {commodity['description']}")
         
         commodities_text = "\n".join(commodities_list)
